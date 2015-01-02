@@ -1,0 +1,14 @@
+{
+  "name": "rollingroad",
+  "version": "1.0.0",
+  "description": "A tiny and extremely simple Javascript tool for benchmarking functions against one-another.",
+  "main": "RollingRoad.js",
+  "keywords": [
+    "benchmark",
+    "performance",
+    "testing",
+    "javascript"
+  ],
+  "author": "Garry Passarella",
+  "license": "MIT"
+}
