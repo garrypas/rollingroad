@@ -10,5 +10,8 @@
     "javascript"
   ],
   "author": "Garry Passarella",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dinqyjs": ">= 1.1.1"
+  }
 }
