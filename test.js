@@ -1,4 +1,4 @@
-var RollingRoad = typeof require != 'undefined' ? require('./rollingroad.js').RollingRoad : RollingRoad;
+var RollingRoad = typeof require != 'undefined' ? require('rollingroad').RollingRoad : RollingRoad;
 
 var function1 = function() {
 	var x = 0;
