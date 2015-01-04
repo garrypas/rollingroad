@@ -13,7 +13,7 @@
  */
 var Dinqyjs = typeof require != 'undefined' ? require('dinqyjs').Dinqyjs : Dinqyjs;
 
-var RollingRoad = (function($collection) {
+var RollingRoad = (function(Collection) {
     'use strict';
     var _testCases = [],
         _iterations = 20000, //With 50% outside the interquartile thrown away
@@ -48,53 +48,48 @@ var RollingRoad = (function($collection) {
     };
     
     var _doSample = function() {
-        var s = 0,
-            samples = new $collection(new Array(_testCases.length)),
+        var s,
+            samples = new Collection(new Array(_testCases.length)),
             t;
 
         for(t = 0; t < samples.count(); t++) {
             samples.element(t, []);
         }
 
+        var addToResults = function(testCaseSample, t) {
+            samples.element(t).push(testCaseSample);
+        };
+
         for(s = 0; s < _samples; s++) {
-            new $collection(_doIteration()).each(function(testCaseSample, t) {
-                samples.element(t).push(testCaseSample);
-            });
+            new Collection(_doIteration()).each(addToResults);
         }
 
         return samples.raw();
     };
     
     rollingRoad.prototype.run = function() {
-        var testCasesLength = _testCases.length,
-            samples = new $collection(_doSample()),
-            iq = _interquartile * .5,
+        var samples = new Collection(_doSample()),
+            iq = _interquartile * 0.5,
             start = parseInt(_samples * iq),
             finish = parseInt(_samples * (1 - iq)),
-            results = new $collection([]),
-            t,
-            s,
-            last,
-            filtered;
+            results = new Collection([]),
+            testCaseSample;
 
-        new $collection(_testCases).each(function(testCase, t) {
-            var result = {
-                name : testCase.name,
-                samples : 0,
-                duration : 0
-            };
-            results.push(result);
+        new Collection(_testCases).each(function(testCase, t) {
 
-            var testCaseSample = new $collection(samples.element(t))
+            testCaseSample = new Collection(samples.element(t))
             .ascending() //sorts samples
             .range(start, finish);
 
-            result.samples = testCaseSample.count();
-            result.duration = testCaseSample.sum();
-            result.median = testCaseSample.median();
-            result.average = testCaseSample.average();
+            results.push({
+                name        : testCase.name,
+                samples     : testCaseSample.count(),
+                duration    : testCaseSample.sum(),
+                median      : testCaseSample.median(),
+                average     : testCaseSample.average()
+            });
         });
-
+        
         _results = results.raw();
         return this;
     };
@@ -117,6 +112,7 @@ var RollingRoad = (function($collection) {
     
     return rollingRoad;
 }(Dinqyjs.Collection));
+
 if (typeof exports === "object" && exports) {
     exports.RollingRoad = RollingRoad;
 }

@@ -16,7 +16,7 @@ if (typeof exports !== "object" || !exports) {
 
 exports.runTest = function() {
 	new RollingRoad({ test: function1, name : 'function1' }, { test: function2, name : 'function2' })
-    	.withOptions( { iterations : 100000, samples : 10, interquartile : 0.5 })
+    	.withOptions( { iterations : 1000000, samples : 50, interquartile : 0.5 })
     	.run()
     	.done(function(results) {
     		console.log(results[0].name
