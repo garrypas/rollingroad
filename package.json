@@ -1,6 +1,6 @@
 {
   "name": "rollingroad",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tiny and extremely simple Javascript tool for benchmarking functions against one-another.",
   "filename": "rollingroad.min.js",
   "main": "rollingroad.min.js",
@@ -11,5 +11,8 @@
     "javascript"
   ],
   "author": "Garry Passarella",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies" : {
+    "dinqyjs" : ">= 1.2.0"
+  }
 }

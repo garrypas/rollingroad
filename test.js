@@ -7,7 +7,7 @@ var function1 = function() {
 
 var function2 = function() {
 	var x = 0;
-	x++;
+	x += 1;
 };
 
 if (typeof exports !== "object" || !exports) {
@@ -16,10 +16,19 @@ if (typeof exports !== "object" || !exports) {
 
 exports.runTest = function() {
 	new RollingRoad({ test: function1, name : 'function1' }, { test: function2, name : 'function2' })
-    	.withOptions( { iterations : 100000, samples : 20 })
+    	.withOptions( { iterations : 100000, samples : 10, interquartile : 0.5 })
     	.run()
     	.done(function(results) {
-    		console.log(results[0].name + ': samples: ' + results[0].samples + ' duration: ' + results[0].duration);
-    		console.log(results[1].name + ': samples: ' + results[1].samples + ' duration: ' + results[1].duration);
+    		console.log(results[0].name
+    			+ '. samples: ' + results[0].samples
+    			+ ' duration: ' + results[0].duration
+    			+ ' median: ' + results[0].median
+    			+ ' average: ' + results[0].average);
+
+    		console.log(results[1].name
+    			+ '. samples: ' + results[1].samples
+    			+ ' duration: ' + results[1].duration
+    			+ ' median: ' + results[1].median
+    			+ ' average: ' + results[1].average);
 	});
 };
