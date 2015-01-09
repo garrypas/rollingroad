@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Garry Passarella
  * Released under the MIT license
- * 
+ *
  * Ensure dinqyjs is included. Download at https://github.com/garrypas/dinqyjs
  * and include in the head section of your .html document. If you are running in
  * Node and have installed with NPM you should get the dependency automatically.
@@ -16,9 +16,9 @@ var Dinqyjs = typeof require != 'undefined' ? require('dinqyjs').Dinqyjs : Dinqy
 var RollingRoad = (function(Collection) {
     'use strict';
     var _testCases = [],
-        _iterations = 20000, //With 50% outside the interquartile thrown away
+        _iterations = 20000, //With 50% outside the disposalRate thrown away
         _samples = 10,
-        _interquartile = 0.5,
+        _disposalRate = 0.5,
         _results;
 
     var rollingRoad = function() {
@@ -29,14 +29,14 @@ var RollingRoad = (function(Collection) {
     var now = function() {
         return new Date().getTime();
     };
-    
+
     var _doIteration = function() {
         var testCasesLength = _testCases.length,
             ops = new Array(testCasesLength),
             t,
             time,
             i;
-        
+
         for(t = 0; t < testCasesLength; t++) {
             time = now();
             for(i = 0; i < _iterations; i++) {
@@ -46,7 +46,7 @@ var RollingRoad = (function(Collection) {
         }
         return ops;
     };
-    
+
     var _doSample = function() {
         var s,
             samples = new Collection(new Array(_testCases.length)),
@@ -66,10 +66,10 @@ var RollingRoad = (function(Collection) {
 
         return samples.raw();
     };
-    
+
     rollingRoad.prototype.run = function() {
         var samples = new Collection(_doSample()),
-            iq = _interquartile * 0.5,
+            iq = _disposalRate * 0.5,
             start = parseInt(_samples * iq),
             finish = parseInt(_samples * (1 - iq)),
             results = new Collection([]),
@@ -81,35 +81,41 @@ var RollingRoad = (function(Collection) {
             .ascending() //sorts samples
             .range(start, finish);
 
-            results.push({
-                name        : testCase.name,
-                samples     : testCaseSample.count(),
-                duration    : testCaseSample.sum(),
-                median      : testCaseSample.median(),
-                average     : testCaseSample.average()
-            });
+            var result = {
+                name          : testCase.name,
+                samples       : testCaseSample.count(),
+                duration      : testCaseSample.sum(),
+                median        : testCaseSample.median(),
+                average       : testCaseSample.average(),
+                mode          : testCaseSample.mode(),
+                lowerquartile : testCaseSample.lowerquartile(),
+                upperquartile : testCaseSample.upperquartile()
+            };
+
+            result.interquartileRange = result.upperquartile - result.lowerquartile;
+            results.push(result);
         });
-        
+
         _results = results.raw();
         return this;
     };
-    
+
     rollingRoad.prototype.done = function(callback) {
         callback(_results);
     };
-    
-    rollingRoad.prototype.withOptions = function(options) {
-        var interquartile = typeof options.interquartile == 'number' ? options.interquartile : _interquartile;
-        if(interquartile < 0 || interquartile > 1) {
-            throw new Error('The interquartile range must be between 0 and 1 inclusive');
-        }
-        _interquartile = interquartile;
 
-        _iterations = +options.iterations > 0 ? parseInt(options.iterations * (1 + _interquartile)) : _iterations;
+    rollingRoad.prototype.withOptions = function(options) {
+        var disposalRate = typeof options.disposalRate == 'number' ? options.disposalRate : _disposalRate;
+        if(disposalRate < 0 || disposalRate > 1) {
+            throw new Error('The disposalRate range must be between 0 and 1 inclusive');
+        }
+        _disposalRate = disposalRate;
+
+        _iterations = +options.iterations > 0 ? parseInt(options.iterations * (1 + _disposalRate)) : _iterations;
         _samples = options.samples || _samples;
         return this;
     };
-    
+
     return rollingRoad;
 }(Dinqyjs.Collection));
 
